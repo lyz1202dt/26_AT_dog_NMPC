@@ -1,0 +1,228 @@
+<mujoco model="dog">
+  <compiler angle="radian"/>
+
+  <asset>
+    <mesh name="body_link" file="body_link.STL"/>
+    <mesh name="lf_link1" file="lf_link1.STL"/>
+    <mesh name="lf_link2" file="lf_link2.STL"/>
+    <mesh name="lf_link3" file="lf_link3.STL"/>
+    <mesh name="lf_link4" file="lf_link4.STL"/>
+    <mesh name="lb_link1" file="lb_link1.STL"/>
+    <mesh name="lb_link2" file="lb_link2.STL"/>
+    <mesh name="lb_link3" file="lb_link3.STL"/>
+    <mesh name="lb_link4" file="lb_link4.STL"/>
+    <mesh name="rf_link1" file="rf_link1.STL"/>
+    <mesh name="rf_link2" file="rf_link2.STL"/>
+    <mesh name="rf_link3" file="rf_link3.STL"/>
+    <mesh name="rf_link4" file="rf_link4.STL"/>
+    <mesh name="rb_link1" file="rb_link1.STL"/>
+    <mesh name="rb_link2" file="rb_link2.STL"/>
+    <mesh name="rb_link3" file="rb_link3.STL"/>
+    <mesh name="rb_link4" file="rb_link4.STL"/>
+  </asset>
+
+  <contact>
+    <exclude body1="body_link" body2="lf_link1" />
+    <exclude body1="body_link" body2="lf_link2" />
+    <exclude body1="lf_link1" body2="lf_link2" />
+    <exclude body1="lf_link2" body2="lf_link3" />
+    <exclude body1="body_link" body2="rf_link1" />
+    <exclude body1="body_link" body2="rf_link2" />
+    <exclude body1="rf_link1" body2="rf_link2" />
+    <exclude body1="rf_link2" body2="rf_link3" />
+  </contact>
+
+  <worldbody>
+    <body name="body_link">
+      <inertial pos="-0.0013088 -0.0021597 0.057384" quat="0.00809625 0.707378 0.00817387 0.706742" mass="3.1484" diaginertia="0.0124624 0.0116616 0.00613259"/>
+      <joint name="float_joint" type="free"/>
+      <geom type="mesh" rgba="1 1 1 1" mesh="body_link"/>
+
+      <site name="imu" pos="0 0 0.056203" size="0.01"/>
+
+      <body name="lf_link1" pos="0.1916 0.069987 0.061999" quat="0.707105 0 0.707108 0">
+        <inertial pos="0.00086233 0.0088226 0.044423" quat="0.529918 0.468084 0.468041 0.530115" mass="0.30526" diaginertia="0.00029454 0.000186897 0.000135453"/>
+        <joint name="lf_joint1" pos="0 0 0" axis="0 0 1" range="-4 4" actuatorfrcrange="-20 20"/>
+        <geom type="mesh" rgba="1 1 1 1" mesh="lf_link1"/>
+        <body name="lf_link2" pos="0 0.029313 0.060013" quat="0.707105 -0.707108 0 0">
+          <inertial pos="0.0641608 -0.000213554 0.0509564" quat="-0.0205508 0.706821 0.0206094 0.706793" mass="0.687935" diaginertia="0.00227863 0.00199284 0.0003119"/>
+          <joint name="lf_joint2" pos="0 0 0" axis="0 0 1" range="-4 4" actuatorfrcrange="-20 20"/>
+          <geom type="mesh" rgba="1 1 1 1" mesh="lf_link2"/>
+          <body name="lf_link3" pos="0.23001 0 0.0935" quat="0.707107 0 0 -0.707107">
+            <inertial pos="0.115135 0 -0.0232452" quat="0 0.707107 0 0.707107" mass="0.0715413" diaginertia="0.00040301 0.000396267 7.16038e-06"/>
+            <joint name="lf_joint3" pos="0 0 0" axis="0 0 1" range="-4 4" actuatorfrcrange="-20 20"/>
+            <geom type="mesh" rgba="1 1 1 1" mesh="lf_link3"/>
+            <body name="lf_link4" pos="0.225 0 0.028">
+              <inertial pos="-8.33838e-07 -2.32183e-06 -0.0137203" quat="0.578319 0.406861 -0.578357 0.406834" mass="0.65" diaginertia="0.000777285 0.000427673 0.000427673"/>
+              <joint name="lf_joint4" pos="0 0 0" axis="0 0 1"/>
+              <!-- <geom type="cylinder" size="0.0625 0.025" rgba="0.941176 0.67451 0.117647 1"/> -->
+               <geom type="mesh" rgba="0.941176 0.67451 0.117647 1" mesh="lf_link4"/>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="lb_link1" pos="-0.1916 0.070013 0.061999" quat="-2.59734e-06 0.707105 -2.59735e-06 -0.707108">
+        <inertial pos="-0.000925124 -0.00878237 0.044547" quat="0.47178 0.534413 0.525583 0.464316" mass="0.305259" diaginertia="0.000294539 0.000186896 0.000135452"/>
+        <joint name="lb_joint1" pos="0 0 0" axis="0 0 1" range="-4 4" actuatorfrcrange="-20 20"/>
+        <geom type="mesh" rgba="0.898039 0.917647 0.929412 1" mesh="lb_link1"/>
+        <body name="lb_link2" pos="-0.00047387 -0.029283 0.059987" quat="0.707105 0.707108 0 0">
+          <inertial pos="0.0622918 -0.000224918 0.0506213" quat="-0.020423 0.706819 0.0203367 0.706807" mass="0.682339" diaginertia="0.00227508 0.00199119 0.000309993"/>
+          <joint name="lb_joint2" pos="0 0 0" axis="0 0 1" range="-4 4" actuatorfrcrange="-20 20"/>
+          <geom type="mesh" rgba="1 1 1 1" mesh="lb_link2"/>
+          <body name="lb_link3" pos="0.23001 1.0811e-05 0.0935" quat="0.707107 0 0 -0.707107">
+            <inertial pos="0.112998 0 -0.0233571" quat="0 0.707107 0 0.707107" mass="0.127541" diaginertia="0.000528885 0.00051696 1.24881e-05"/>
+            <joint name="lb_joint3" pos="0 0 0" axis="0 0 1" range="-4 4" actuatorfrcrange="-20 20"/>
+            <geom type="mesh" rgba="1 1 1 1" mesh="lb_link3"/>
+            <body name="lb_link4" pos="0.225 0 0.028">
+              <inertial pos="1.20294e-06 -1.88942e-06 -0.0136284" quat="0.340007 0.620009 -0.340028 0.619971" mass="0.65" diaginertia="0.000837967 0.000460072 0.000460072"/>
+              <joint name="lb_joint4" pos="0 0 0" axis="0 0 1"/>
+              <!-- <geom type="cylinder" size="0.0625 0.025" rgba="0.941176 0.67451 0.117647 1"/> -->
+               <geom type="mesh" rgba="0.941176 0.67451 0.117647 1" mesh="lb_link4"/>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="rf_link1" pos="0.1916 -0.070013 0.061999" quat="0.707105 0 0.707108 0">
+        <inertial pos="-0.000782754 -0.00879617 0.044547" quat="0.468009 0.530146 0.529887 0.468116" mass="0.305259" diaginertia="0.000294539 0.000186896 0.000135452"/>
+        <joint name="rf_joint1" pos="0 0 0" axis="0 0 1" range="-4 4" actuatorfrcrange="-20 20"/>
+        <geom type="mesh" rgba="0.898039 0.917647 0.929412 1" mesh="rf_link1"/>
+        <body name="rf_link2" pos="0 -0.029287 0.059987" quat="0.707105 0.707108 0 0">
+          <inertial pos="0.0624597 0.000179393 0.0506213" quat="0.0206567 0.706822 -0.0205632 0.706791" mass="0.682339" diaginertia="0.00227508 0.00199108 0.000310098"/>
+          <joint name="rf_joint2" pos="0 0 0" axis="0 0 1" range="-4 4" actuatorfrcrange="-20 20"/>
+          <geom type="mesh" rgba="1 1 1 1" mesh="rf_link2"/>
+          <body name="rf_link3" pos="0.22999 1.0192e-05 0.0935" quat="0.707107 0 0 0.707107">
+            <inertial pos="0.113978 0 -0.0233571" quat="0 0.707107 0 0.707107" mass="0.127541" diaginertia="0.000528885 0.00051696 1.24881e-05"/>
+            <joint name="rf_joint3" pos="0 0 0" axis="0 0 1" range="-4 4" actuatorfrcrange="-20 20"/>
+            <geom type="mesh" rgba="1 1 1 1" mesh="rf_link3"/>
+            <body name="rf_link4" pos="0.225 0 0.028">
+              <inertial pos="2.17473e-06 5.36337e-07 -0.0136284" quat="-0.0854743 0.701943 0.0854796 0.7019" mass="0.65" diaginertia="0.000837967 0.000460072 0.000460072"/>
+              <joint name="rf_joint4" pos="0 0 0" axis="0 0 1"/>
+              <!-- <geom type="cylinder" size="0.0625 0.025" rgba="0.941176 0.67451 0.117647 1"/> -->
+               <geom type="mesh" rgba="0.941176 0.67451 0.117647 1" mesh="rf_link4"/>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="rb_link1" pos="-0.1916 -0.07 0.062" quat="-2.59734e-06 0.707105 -2.59735e-06 -0.707108">
+        <inertial pos="0.000471305 0.00883904 0.0444224" quat="0.518015 0.457575 0.47832 0.541752" mass="0.305258" diaginertia="0.000294539 0.000186896 0.000135452"/>
+        <joint name="rb_joint1" pos="0 0 0" axis="0 0 1" range="-4 4" actuatorfrcrange="-20 20"/>
+        <geom type="mesh" rgba="0.898039 0.917647 0.929412 1" mesh="rb_link1"/>
+        <body name="rb_link2" pos="-0.001301 0.029271 0.06" quat="0.707105 -0.707108 0 0">
+          <inertial pos="0.0622013 0.000257699 0.0506213" quat="0.0205637 0.706825 -0.0204707 0.706793" mass="0.682339" diaginertia="0.00227508 0.00199133 0.000309844"/>
+          <joint name="rb_joint2" pos="0 0 0" axis="0 0 1" range="-4 4" actuatorfrcrange="-20 20"/>
+          <geom type="mesh" rgba="1 1 1 1" mesh="rb_link2"/>
+          <body name="rb_link3" pos="0.23 0 0.0935" quat="0.707107 0 0 0.707107">
+            <inertial pos="0.112998 0 -0.0233571" quat="0 0.707107 0 0.707107" mass="0.127541" diaginertia="0.000528885 0.00051696 1.24881e-05"/>
+            <joint name="rb_joint3" pos="0 0 0" axis="0 0 1" range="-4 4" actuatorfrcrange="-20 20"/>
+            <geom type="mesh" rgba="1 1 1 1" mesh="rb_link3"/>
+            <body name="rb_link4" pos="0.225 0 0.028">
+              <inertial pos="1.99351e-08 -2.23938e-06 -0.0136284" quat="0.499985 0.500015 -0.500015 0.499985" mass="0.65" diaginertia="0.000837967 0.000460072 0.000460072"/>
+              <joint name="rb_joint4" pos="0 0 0" axis="0 0 1"/>
+              <!-- <geom type="cylinder" size="0.0625 0.025" rgba="0.941176 0.67451 0.117647 1"/> -->
+               <geom type="mesh" rgba="0.941176 0.67451 0.117647 1" mesh="rb_link4"/>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+        <!-- Left Front -->
+        <motor name="lf_motor1" joint="lf_joint1" gear="1" ctrllimited="true" ctrlrange="-20 20" />
+        <motor name="lf_motor2" joint="lf_joint2" gear="1" ctrllimited="true" ctrlrange="-20 20" />
+        <motor name="lf_motor3" joint="lf_joint3" gear="1" ctrllimited="true" ctrlrange="-20 20" />
+        <motor name="lf_motor4" joint="lf_joint4" gear="1" ctrllimited="true" ctrlrange="-2 2" />
+
+        <!-- Right Front -->
+        <motor name="rf_motor1" joint="rf_joint1" gear="1" ctrllimited="true" ctrlrange="-20 20" />
+        <motor name="rf_motor2" joint="rf_joint2" gear="1" ctrllimited="true" ctrlrange="-20 20" />
+        <motor name="rf_motor3" joint="rf_joint3" gear="1" ctrllimited="true" ctrlrange="-20 20" />
+        <motor name="rf_motor4" joint="rf_joint4" gear="1" ctrllimited="true" ctrlrange="-2 2" />
+
+        <!-- Left Back -->
+        <motor name="lb_motor1" joint="lb_joint1" gear="1" ctrllimited="true" ctrlrange="-20 20" />
+        <motor name="lb_motor2" joint="lb_joint2" gear="1" ctrllimited="true" ctrlrange="-20 20" />
+        <motor name="lb_motor3" joint="lb_joint3" gear="1" ctrllimited="true" ctrlrange="-20 20" />
+        <motor name="lb_motor4" joint="lb_joint4" gear="1" ctrllimited="true" ctrlrange="-2 2" />
+
+        <!-- Right Back -->
+        <motor name="rb_motor1" joint="rb_joint1" gear="1" ctrllimited="true" ctrlrange="-20 20" />
+        <motor name="rb_motor2" joint="rb_joint2" gear="1" ctrllimited="true" ctrlrange="-20 20" />
+        <motor name="rb_motor3" joint="rb_joint3" gear="1" ctrllimited="true" ctrlrange="-20 20" />
+        <motor name="rb_motor4" joint="rb_joint4" gear="1" ctrllimited="true" ctrlrange="-2 2" />
+  </actuator>
+
+
+  <sensor>
+        <!-- actuator position -->
+        <actuatorpos name="lf_motor1_p" actuator="lf_motor1" />
+        <actuatorpos name="lf_motor2_p" actuator="lf_motor2" />
+        <actuatorpos name="lf_motor3_p" actuator="lf_motor3" />
+        <actuatorpos name="lf_motor4_p" actuator="lf_motor4" />
+
+        <actuatorpos name="rf_motor1_p" actuator="rf_motor1" />
+        <actuatorpos name="rf_motor2_p" actuator="rf_motor2" />
+        <actuatorpos name="rf_motor3_p" actuator="rf_motor3" />
+        <actuatorpos name="rf_motor4_p" actuator="rf_motor4" />
+
+        <actuatorpos name="lb_motor1_p" actuator="lb_motor1" />
+        <actuatorpos name="lb_motor2_p" actuator="lb_motor2" />
+        <actuatorpos name="lb_motor3_p" actuator="lb_motor3" />
+        <actuatorpos name="lb_motor4_p" actuator="lb_motor4" />
+
+        <actuatorpos name="rb_motor1_p" actuator="rb_motor1" />
+        <actuatorpos name="rb_motor2_p" actuator="rb_motor2" />
+        <actuatorpos name="rb_motor3_p" actuator="rb_motor3" />
+        <actuatorpos name="rb_motor4_p" actuator="rb_motor4" />
+
+        <!-- actuator velocity -->
+        <actuatorvel name="lf_motor1_v" actuator="lf_motor1" />
+        <actuatorvel name="lf_motor2_v" actuator="lf_motor2" />
+        <actuatorvel name="lf_motor3_v" actuator="lf_motor3" />
+        <actuatorvel name="lf_motor4_v" actuator="lf_motor4" />
+
+        <actuatorvel name="rf_motor1_v" actuator="rf_motor1" />
+        <actuatorvel name="rf_motor2_v" actuator="rf_motor2" />
+        <actuatorvel name="rf_motor3_v" actuator="rf_motor3" />
+        <actuatorvel name="rf_motor4_v" actuator="rf_motor4" />
+
+        <actuatorvel name="lb_motor1_v" actuator="lb_motor1" />
+        <actuatorvel name="lb_motor2_v" actuator="lb_motor2" />
+        <actuatorvel name="lb_motor3_v" actuator="lb_motor3" />
+        <actuatorvel name="lb_motor4_v" actuator="lb_motor4" />
+
+        <actuatorvel name="rb_motor1_v" actuator="rb_motor1" />
+        <actuatorvel name="rb_motor2_v" actuator="rb_motor2" />
+        <actuatorvel name="rb_motor3_v" actuator="rb_motor3" />
+        <actuatorvel name="rb_motor4_v" actuator="rb_motor4" />
+
+        <!-- actuator force -->
+        <actuatorfrc name="lf_motor1_f" actuator="lf_motor1" noise="1e-3" />
+        <actuatorfrc name="lf_motor2_f" actuator="lf_motor2" noise="1e-3" />
+        <actuatorfrc name="lf_motor3_f" actuator="lf_motor3" noise="1e-3" />
+        <actuatorfrc name="lf_motor4_f" actuator="lf_motor4" noise="1e-3" />
+
+        <actuatorfrc name="rf_motor1_f" actuator="rf_motor1" noise="1e-3" />
+        <actuatorfrc name="rf_motor2_f" actuator="rf_motor2" noise="1e-3" />
+        <actuatorfrc name="rf_motor3_f" actuator="rf_motor3" noise="1e-3" />
+        <actuatorfrc name="rf_motor4_f" actuator="rf_motor4" noise="1e-3" />
+
+        <actuatorfrc name="lb_motor1_f" actuator="lb_motor1" noise="1e-3" />
+        <actuatorfrc name="lb_motor2_f" actuator="lb_motor2" noise="1e-3" />
+        <actuatorfrc name="lb_motor3_f" actuator="lb_motor3" noise="1e-3" />
+        <actuatorfrc name="lb_motor4_f" actuator="lb_motor4" noise="1e-3" />
+
+        <actuatorfrc name="rb_motor1_f" actuator="rb_motor1" noise="1e-3" />
+        <actuatorfrc name="rb_motor2_f" actuator="rb_motor2" noise="1e-3" />
+        <actuatorfrc name="rb_motor3_f" actuator="rb_motor3" noise="1e-3" />
+        <actuatorfrc name="rb_motor4_f" actuator="rb_motor4" noise="1e-3" />
+
+        <!-- IMU (imu_main): pose/orientation + acceleration + angular velocity -->
+        <accelerometer name="imu_main_acc" site="imu" />
+        <gyro name="imu_main_gyro" site="imu" />
+        <framequat name="imu_main_quat" objtype="site" objname="imu" />
+  </sensor>
+
+  
+</mujoco>

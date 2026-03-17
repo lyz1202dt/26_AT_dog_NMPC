@@ -1,0 +1,9 @@
+<library path="hardware_at_dog">
+  <class name="hardware_at_dog/HardwareATDog"
+         type="HardwareATDog"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Robot System for robot.
+    </description>
+  </class>
+</library>
