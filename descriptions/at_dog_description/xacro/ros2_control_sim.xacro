@@ -120,13 +120,6 @@
 			<state_interface name="linear_acceleration.z"/>
 		</sensor>
 
-		<sensor name="foot_force">
-			<state_interface name="lf"/>
-			<state_interface name="rf"/>
-			<state_interface name="lb"/>
-			<state_interface name="rb"/>
-		</sensor>
-
 		<sensor name="odometer">
 			<state_interface name="position.x"/>
 			<state_interface name="position.y"/>

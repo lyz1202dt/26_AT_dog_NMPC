@@ -1,0 +1,62 @@
+# Controller Manager configuration
+controller_manager:
+  ros__parameters:
+    update_rate: 1000  # Hz
+
+    # Define the available controllers
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    imu_sensor_broadcaster:
+      type: imu_sensor_broadcaster/IMUSensorBroadcaster
+
+    ocs2_quadruped_controller:
+      type: ocs2_quadruped_controller/Ocs2QuadrupedController
+
+imu_sensor_broadcaster:
+  ros__parameters:
+    sensor_name: "imu_sensor"
+    frame_id: "imu_link"
+
+
+ocs2_quadruped_controller:
+  ros__parameters:
+    update_rate: 500  # Hz
+    robot_pkg: "at_dog_description"
+#    default_kd: 3.5
+    joints:
+      - lf_joint1
+      - lf_joint2
+      - lf_joint3
+      - rf_joint1
+      - rf_joint2
+      - rf_joint3
+      - lb_joint1
+      - lb_joint2
+      - lb_joint3
+      - rb_joint1
+      - rb_joint2
+      - rb_joint3
+
+    command_interfaces:
+      - effort
+
+    state_interfaces:
+      - effort
+      - position
+      - velocity
+
+    imu_name: "imu_sensor"
+    base_name: "base"
+
+    imu_interfaces:
+      - orientation.w
+      - orientation.x
+      - orientation.y
+      - orientation.z
+      - angular_velocity.x
+      - angular_velocity.y
+      - angular_velocity.z
+      - linear_acceleration.x
+      - linear_acceleration.y
+      - linear_acceleration.z

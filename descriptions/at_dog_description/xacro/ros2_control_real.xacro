@@ -7,7 +7,7 @@
 			<plugin>hardware_at_dog/HardwareATDog</plugin>
 		</hardware>
 
-		<joint name="lf_hip_joint">
+		<joint name="lf_joint1">
 			<command_interface name="position"/>
 			<command_interface name="velocity"/>
 			<command_interface name="effort"/>
@@ -19,7 +19,7 @@
 			<state_interface name="effort"/>
 		</joint>
 
-		<joint name="lf_thigh_joint">
+		<joint name="lf_joint2">
 			<command_interface name="position"/>
 			<command_interface name="velocity"/>
 			<command_interface name="effort"/>
@@ -31,7 +31,7 @@
 			<state_interface name="effort"/>
 		</joint>
 
-		<joint name="lf_calf_joint">
+		<joint name="lf_joint3">
 			<command_interface name="position"/>
 			<command_interface name="velocity"/>
 			<command_interface name="effort"/>
@@ -43,7 +43,7 @@
 			<state_interface name="effort"/>
 		</joint>
 
-		<joint name="rf_hip_joint">
+		<joint name="rf_joint1">
 			<command_interface name="position"/>
 			<command_interface name="velocity"/>
 			<command_interface name="effort"/>
@@ -55,7 +55,7 @@
 			<state_interface name="effort"/>
 		</joint>
 
-		<joint name="rf_thigh_joint">
+		<joint name="rf_joint2">
 			<command_interface name="position"/>
 			<command_interface name="velocity"/>
 			<command_interface name="effort"/>
@@ -67,7 +67,7 @@
 			<state_interface name="effort"/>
 		</joint>
 
-		<joint name="rf_calf_joint">
+		<joint name="rf_joint3">
 			<command_interface name="position"/>
 			<command_interface name="velocity"/>
 			<command_interface name="effort"/>
@@ -79,7 +79,7 @@
 			<state_interface name="effort"/>
 		</joint>
 
-		<joint name="lb_hip_joint">
+		<joint name="lb_joint1">
 			<command_interface name="position"/>
 			<command_interface name="velocity"/>
 			<command_interface name="effort"/>
@@ -91,7 +91,7 @@
 			<state_interface name="effort"/>
 		</joint>
 
-		<joint name="lb_thigh_joint">
+		<joint name="lb_joint2">
 			<command_interface name="position"/>
 			<command_interface name="velocity"/>
 			<command_interface name="effort"/>
@@ -103,7 +103,7 @@
 			<state_interface name="effort"/>
 		</joint>
 
-		<joint name="lb_calf_joint">
+		<joint name="lb_joint3">
 			<command_interface name="position"/>
 			<command_interface name="velocity"/>
 			<command_interface name="effort"/>
@@ -115,7 +115,7 @@
 			<state_interface name="effort"/>
 		</joint>
 
-		<joint name="rb_hip_joint">
+		<joint name="rb_joint1">
 			<command_interface name="position"/>
 			<command_interface name="velocity"/>
 			<command_interface name="effort"/>
@@ -127,7 +127,7 @@
 			<state_interface name="effort"/>
 		</joint>
 
-		<joint name="rb_thigh_joint">
+		<joint name="rb_joint2">
 			<command_interface name="position"/>
 			<command_interface name="velocity"/>
 			<command_interface name="effort"/>
@@ -139,7 +139,7 @@
 			<state_interface name="effort"/>
 		</joint>
 
-		<joint name="rb_calf_joint">
+		<joint name="rb_joint3">
 			<command_interface name="position"/>
 			<command_interface name="velocity"/>
 			<command_interface name="effort"/>
@@ -162,13 +162,6 @@
 			<state_interface name="linear_acceleration.x"/>
 			<state_interface name="linear_acceleration.y"/>
 			<state_interface name="linear_acceleration.z"/>
-		</sensor>
-
-		<sensor name="foot_force">
-			<state_interface name="lf"/>
-			<state_interface name="rf"/>
-			<state_interface name="lb"/>
-			<state_interface name="rb"/>
 		</sensor>
 
 		<sensor name="odometer">
