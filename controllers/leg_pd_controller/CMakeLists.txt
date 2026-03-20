@@ -50,6 +50,11 @@ install(
 )
 
 install(
+        DIRECTORY launch/
+        DESTINATION share/${PROJECT_NAME}/launch
+)
+
+install(
         TARGETS ${PROJECT_NAME}
         EXPORT export_${PROJECT_NAME}
         ARCHIVE DESTINATION lib/${PROJECT_NAME}

@@ -132,25 +132,25 @@
         <motor name="lf_motor1" joint="lf_joint1" gear="1" ctrllimited="true" ctrlrange="-20 20" />
         <motor name="lf_motor2" joint="lf_joint2" gear="1" ctrllimited="true" ctrlrange="-20 20" />
         <motor name="lf_motor3" joint="lf_joint3" gear="1" ctrllimited="true" ctrlrange="-20 20" />
-        <motor name="lf_motor4" joint="lf_joint4" gear="1" ctrllimited="true" ctrlrange="-2 2" />
+        <!-- <motor name="lf_motor4" joint="lf_joint4" gear="1" ctrllimited="true" ctrlrange="-2 2" /> -->
 
         <!-- Right Front -->
         <motor name="rf_motor1" joint="rf_joint1" gear="1" ctrllimited="true" ctrlrange="-20 20" />
         <motor name="rf_motor2" joint="rf_joint2" gear="1" ctrllimited="true" ctrlrange="-20 20" />
         <motor name="rf_motor3" joint="rf_joint3" gear="1" ctrllimited="true" ctrlrange="-20 20" />
-        <motor name="rf_motor4" joint="rf_joint4" gear="1" ctrllimited="true" ctrlrange="-2 2" />
+        <!-- <motor name="rf_motor4" joint="rf_joint4" gear="1" ctrllimited="true" ctrlrange="-2 2" /> -->
 
         <!-- Left Back -->
         <motor name="lb_motor1" joint="lb_joint1" gear="1" ctrllimited="true" ctrlrange="-20 20" />
         <motor name="lb_motor2" joint="lb_joint2" gear="1" ctrllimited="true" ctrlrange="-20 20" />
         <motor name="lb_motor3" joint="lb_joint3" gear="1" ctrllimited="true" ctrlrange="-20 20" />
-        <motor name="lb_motor4" joint="lb_joint4" gear="1" ctrllimited="true" ctrlrange="-2 2" />
+        <!-- <motor name="lb_motor4" joint="lb_joint4" gear="1" ctrllimited="true" ctrlrange="-2 2" /> -->
 
         <!-- Right Back -->
         <motor name="rb_motor1" joint="rb_joint1" gear="1" ctrllimited="true" ctrlrange="-20 20" />
         <motor name="rb_motor2" joint="rb_joint2" gear="1" ctrllimited="true" ctrlrange="-20 20" />
         <motor name="rb_motor3" joint="rb_joint3" gear="1" ctrllimited="true" ctrlrange="-20 20" />
-        <motor name="rb_motor4" joint="rb_joint4" gear="1" ctrllimited="true" ctrlrange="-2 2" />
+        <!-- <motor name="rb_motor4" joint="rb_joint4" gear="1" ctrllimited="true" ctrlrange="-2 2" /> -->
   </actuator>
 
 
@@ -159,64 +159,64 @@
         <actuatorpos name="lf_motor1_p" actuator="lf_motor1" />
         <actuatorpos name="lf_motor2_p" actuator="lf_motor2" />
         <actuatorpos name="lf_motor3_p" actuator="lf_motor3" />
-        <actuatorpos name="lf_motor4_p" actuator="lf_motor4" />
+        <!-- <actuatorpos name="lf_motor4_p" actuator="lf_motor4" /> -->
 
         <actuatorpos name="rf_motor1_p" actuator="rf_motor1" />
         <actuatorpos name="rf_motor2_p" actuator="rf_motor2" />
         <actuatorpos name="rf_motor3_p" actuator="rf_motor3" />
-        <actuatorpos name="rf_motor4_p" actuator="rf_motor4" />
+        <!-- <actuatorpos name="rf_motor4_p" actuator="rf_motor4" /> -->
 
         <actuatorpos name="lb_motor1_p" actuator="lb_motor1" />
         <actuatorpos name="lb_motor2_p" actuator="lb_motor2" />
         <actuatorpos name="lb_motor3_p" actuator="lb_motor3" />
-        <actuatorpos name="lb_motor4_p" actuator="lb_motor4" />
+        <!-- <actuatorpos name="lb_motor4_p" actuator="lb_motor4" /> -->
 
         <actuatorpos name="rb_motor1_p" actuator="rb_motor1" />
         <actuatorpos name="rb_motor2_p" actuator="rb_motor2" />
         <actuatorpos name="rb_motor3_p" actuator="rb_motor3" />
-        <actuatorpos name="rb_motor4_p" actuator="rb_motor4" />
+        <!-- <actuatorpos name="rb_motor4_p" actuator="rb_motor4" /> -->
 
         <!-- actuator velocity -->
         <actuatorvel name="lf_motor1_v" actuator="lf_motor1" />
         <actuatorvel name="lf_motor2_v" actuator="lf_motor2" />
         <actuatorvel name="lf_motor3_v" actuator="lf_motor3" />
-        <actuatorvel name="lf_motor4_v" actuator="lf_motor4" />
+        <!-- <actuatorvel name="lf_motor4_v" actuator="lf_motor4" /> -->
 
         <actuatorvel name="rf_motor1_v" actuator="rf_motor1" />
         <actuatorvel name="rf_motor2_v" actuator="rf_motor2" />
         <actuatorvel name="rf_motor3_v" actuator="rf_motor3" />
-        <actuatorvel name="rf_motor4_v" actuator="rf_motor4" />
+        <!-- <actuatorvel name="rf_motor4_v" actuator="rf_motor4" /> -->
 
         <actuatorvel name="lb_motor1_v" actuator="lb_motor1" />
         <actuatorvel name="lb_motor2_v" actuator="lb_motor2" />
         <actuatorvel name="lb_motor3_v" actuator="lb_motor3" />
-        <actuatorvel name="lb_motor4_v" actuator="lb_motor4" />
+        <!-- <actuatorvel name="lb_motor4_v" actuator="lb_motor4" /> -->
 
         <actuatorvel name="rb_motor1_v" actuator="rb_motor1" />
         <actuatorvel name="rb_motor2_v" actuator="rb_motor2" />
         <actuatorvel name="rb_motor3_v" actuator="rb_motor3" />
-        <actuatorvel name="rb_motor4_v" actuator="rb_motor4" />
+        <!-- <actuatorvel name="rb_motor4_v" actuator="rb_motor4" /> -->
 
         <!-- actuator force -->
         <actuatorfrc name="lf_motor1_f" actuator="lf_motor1" noise="1e-3" />
         <actuatorfrc name="lf_motor2_f" actuator="lf_motor2" noise="1e-3" />
         <actuatorfrc name="lf_motor3_f" actuator="lf_motor3" noise="1e-3" />
-        <actuatorfrc name="lf_motor4_f" actuator="lf_motor4" noise="1e-3" />
+        <!-- <actuatorfrc name="lf_motor4_f" actuator="lf_motor4" noise="1e-3" /> -->
 
         <actuatorfrc name="rf_motor1_f" actuator="rf_motor1" noise="1e-3" />
         <actuatorfrc name="rf_motor2_f" actuator="rf_motor2" noise="1e-3" />
         <actuatorfrc name="rf_motor3_f" actuator="rf_motor3" noise="1e-3" />
-        <actuatorfrc name="rf_motor4_f" actuator="rf_motor4" noise="1e-3" />
+        <!-- <actuatorfrc name="rf_motor4_f" actuator="rf_motor4" noise="1e-3" /> -->
 
         <actuatorfrc name="lb_motor1_f" actuator="lb_motor1" noise="1e-3" />
         <actuatorfrc name="lb_motor2_f" actuator="lb_motor2" noise="1e-3" />
         <actuatorfrc name="lb_motor3_f" actuator="lb_motor3" noise="1e-3" />
-        <actuatorfrc name="lb_motor4_f" actuator="lb_motor4" noise="1e-3" />
+        <!-- <actuatorfrc name="lb_motor4_f" actuator="lb_motor4" noise="1e-3" /> -->
 
         <actuatorfrc name="rb_motor1_f" actuator="rb_motor1" noise="1e-3" />
         <actuatorfrc name="rb_motor2_f" actuator="rb_motor2" noise="1e-3" />
         <actuatorfrc name="rb_motor3_f" actuator="rb_motor3" noise="1e-3" />
-        <actuatorfrc name="rb_motor4_f" actuator="rb_motor4" noise="1e-3" />
+        <!-- <actuatorfrc name="rb_motor4_f" actuator="rb_motor4" noise="1e-3" /> -->
 
         <!-- IMU (imu_main): pose/orientation + acceleration + angular velocity -->
         <accelerometer name="imu_main_accel" site="imu" />
