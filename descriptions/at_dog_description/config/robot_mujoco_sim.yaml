@@ -15,7 +15,7 @@ controller_manager:
 
 imu_sensor_broadcaster:
   ros__parameters:
-    sensor_name: "imu_sensor"
+    sensor_name: "imu_main_imu"
     frame_id: "imu_link"
 
 
@@ -46,7 +46,7 @@ ocs2_quadruped_controller:
       - position
       - velocity
 
-    imu_name: "imu_sensor"
+    imu_name: "imu_main_imu"
     base_name: "base"
 
     imu_interfaces:

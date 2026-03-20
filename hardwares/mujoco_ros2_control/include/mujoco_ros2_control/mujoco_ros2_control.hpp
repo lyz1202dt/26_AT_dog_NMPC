@@ -18,27 +18,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef MUJOCO_ROS2_CONTROL__MUJOCO_SYSTEM_INTERFACE_HPP_
-#define MUJOCO_ROS2_CONTROL__MUJOCO_SYSTEM_INTERFACE_HPP_
+#ifndef MUJOCO_ROS2_CONTROL__MUJOCO_ROS2_CONTROL_HPP_
+#define MUJOCO_ROS2_CONTROL__MUJOCO_ROS2_CONTROL_HPP_
 
-#include "hardware_interface/system_interface.hpp"
-#include "mujoco/mujoco.h"
+#include <memory>
+#include <string>
+
+#include "controller_manager/controller_manager.hpp"
+#include "pluginlib/class_loader.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "urdf/model.h"
+#include "rosgraph_msgs/msg/clock.hpp"
+
+#include "mujoco/mujoco.h"
+
+#include "mujoco_ros2_control/mujoco_system.hpp"
 
 namespace mujoco_ros2_control
 {
-using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
-
-class MujocoSystemInterface : public hardware_interface::SystemInterface
+class MujocoRos2Control
 {
 public:
-  virtual bool init_sim(
-    mjModel *mujoco_model, mjData *mujoco_data, const urdf::Model &urdf_model,
-    const hardware_interface::HardwareInfo &hardware_info) = 0;
+  MujocoRos2Control(rclcpp::Node::SharedPtr &node, mjModel *mujoco_model, mjData *mujoco_data);
+  ~MujocoRos2Control();
+  void init();
+  void update();
 
-protected:
+private:
+  void publish_sim_time(rclcpp::Time sim_time);
+  std::string get_robot_description();
+  rclcpp::Node::SharedPtr node_;
+  mjModel *mj_model_;
+  mjData *mj_data_;
+
+  rclcpp::Logger logger_;
+  std::shared_ptr<pluginlib::ClassLoader<MujocoSystemInterface>> robot_hw_sim_loader_;
+
+  std::shared_ptr<controller_manager::ControllerManager> controller_manager_;
+  rclcpp::Executor::SharedPtr cm_executor_;
+  std::thread cm_thread_;
+  bool stop_cm_thread_;
+  rclcpp::Duration control_period_;
+
+  rclcpp::Time last_update_sim_time_ros_;
+  rclcpp::Publisher<rosgraph_msgs::msg::Clock>::SharedPtr clock_publisher_;
 };
 }  // namespace mujoco_ros2_control
 
-#endif  // MUJOCO_ROS2_CONTROL__MUJOCO_SYSTEM_INTERFACE_HPP_
+#endif  // MUJOCO_ROS2_CONTROL__MUJOCO_ROS2_CONTROL_HPP_

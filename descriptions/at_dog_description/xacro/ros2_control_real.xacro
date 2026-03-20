@@ -151,7 +151,7 @@
 			<state_interface name="effort"/>
 		</joint>
 
-		<sensor name="imu_sensor">
+		<sensor name="imu_main_imu">
 			<state_interface name="orientation.w"/>
 			<state_interface name="orientation.x"/>
 			<state_interface name="orientation.y"/>
