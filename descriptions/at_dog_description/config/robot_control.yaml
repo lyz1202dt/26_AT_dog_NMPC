@@ -7,8 +7,16 @@ controller_manager:
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
+    imu_sensor_broadcaster:
+      type: imu_sensor_broadcaster/IMUSensorBroadcaster
+
     ocs2_quadruped_controller:
       type: ocs2_quadruped_controller/Ocs2QuadrupedController
+
+imu_sensor_broadcaster:
+  ros__parameters:
+    sensor_name: imu_main_imu
+    frame_id: imu_main_link
 
 
 
@@ -42,3 +50,16 @@ ocs2_quadruped_controller:
       - effort
       - position
       - velocity
+
+    imu_name: imu_main_imu
+    imu_interfaces:
+      - orientation.w
+      - orientation.x
+      - orientation.y
+      - orientation.z
+      - angular_velocity.x
+      - angular_velocity.y
+      - angular_velocity.z
+      - linear_acceleration.x
+      - linear_acceleration.y
+      - linear_acceleration.z

@@ -1,142 +1,53 @@
-# URDF Configuration (for usage with xacro2mjcf script)
+# mujoco_ros2_control
 
-To use this package with an existing robot description (URDF or Xacro), create a **Xacro wrapper file** that merges:
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-- your existing robot description,
-- the MuJoCo configuration, and
-- the ROS 2 Control configuration.
+## Overview
 
-For reference, see the `urdf` directories in the provided examples ([franka](https://github.com/dfki-ric/mujoco_ros2_control/blob/main/examples/franka_mujoco/urdf/franka.urdf.xacro), [unitree](https://github.com/dfki-ric/mujoco_ros2_control/blob/main/examples/unitree_h1_mujoco/urdf/unitree_h1.urdf.xacro)).
+This repository contains a ROS2 control package for Mujoco simulation, offering the `MujocoSystem` plugin to integrate `ros2_control` with Mujoco. Additionally, it includes a node responsible for initializing the plugin, Mujoco rendering, and the simulation.
 
----
+## Installation Guide
 
-## MuJoCo-Specific Elements
+Follow these steps to install and run the project locally.
 
-The following snippet shows how to integrate MuJoCo configuration elements into your robot description:
+### Prerequisites
 
-```xml
-<mujoco>
-    <!-- Compiler options:
-         https://mujoco.readthedocs.io/en/stable/XMLreference.html#compiler -->
-    <compiler
-        meshdir="/tmp/mujoco/meshes"
-        discardvisual="true"
-        autolimits="false"
-        balanceinertia="true"/>
+Make sure you have the following software installed if you are running on the local machine:
 
-    <!-- Global simulation options:
-         https://mujoco.readthedocs.io/en/stable/XMLreference.html#option -->
-    <option
-        integrator="implicitfast"
-        gravity="0 0 -9.81"
-        impratio="10"
-        cone="elliptic"
-        solver="Newton">
-        <flag multiccd="enable"/>
-    </option>
+- [ROS](https://docs.ros.org/)
+- [Mujoco](https://mujoco.org/)
 
-    <!-- Add elements/tags to an MJCF body or any of its children -->
-    <reference name="${prefix}left_inner_finger">
-        <!-- Add per-body and per-joint configuration -->
-        <body gravcomp="1"/>            <!-- Enable gravity compensation -->
-        <joint damping="10"/>           <!-- Add damping to all child joints -->
+### Package Install
 
-        <!-- Modify a child geom with the given name -->
-        <geom
-            name="geom1"
-            friction="0.7"
-            mass="0"
-            priority="1"
-            solimp="0.95 0.99 0.001"
-            solref="0.004 1"/>
-    </reference>
+Before build this package configure environment variable for mujoco directory.
 
-    <!-- Define an RGB-D camera:
-         https://mujoco.readthedocs.io/en/stable/XMLreference.html#body-camera -->
-    <reference name="camera_link">
-        <camera
-            name="camera"
-            mode="fixed"
-            fovy="45"
-            quat="0.5 0.5 -0.5 -0.5"/>
-    </reference>
-
-    <!-- Camera pose sensors relative to the world frame -->
-    <sensor>
-        <!-- Position sensor:
-             https://mujoco.readthedocs.io/en/stable/XMLreference.html#sensor-framepos -->
-        <framepos
-            name="camera_link_pose"
-            objtype="body"
-            objname="camera_link"
-            reftype="body"
-            refname="world"/>
-
-        <!-- Orientation sensor:
-             https://mujoco.readthedocs.io/en/stable/XMLreference.html#sensor-framequat -->
-        <framequat
-            name="camera_link_quat"
-            objtype="body"
-            objname="camera_link"
-            reftype="body"
-            refname="world"/>
-    </sensor>
-
-    <!-- Actuator definition:
-         https://mujoco.readthedocs.io/en/stable/XMLreference.html#actuator -->
-    <actuator>
-        <position
-            name="pos_finger_joint1"
-            joint="${arm_id}_finger_joint1"
-            kp="1000"
-            forcelimited="true"
-            forcerange="-120 120"
-            ctrllimited="true"
-            ctrlrange="0 0.04"
-            user="1"/>
-    </actuator>
-</mujoco>
+```bash
+export MUJOCO_DIR=/PATH/TO/MUJOCO/mujoco-3.x.x
 ```
 
-## ROS 2 Control Hardware Example
-Below is an example of how to declare a ROS 2 Control system using PID and torque control:
-```xml
-<ros2_control name="${prefix}${name}" type="system">
-    <hardware>
-        <plugin>mujoco_ros2_control/MujocoSystem</plugin>
-    </hardware>
+You can now compile the package using the following commands.
 
-    <!-- Joint with position + velocity + acceleration PID control -->
-    <joint name="joint1">
-        <command_interface name="position"/>
-        <command_interface name="velocity"/>
-        <command_interface name="acceleration"/>
-
-        <param name="kp">1000.0</param>
-        <param name="ki">0.0</param>
-        <param name="kd">0.01</param>
-
-        <!-- Only required when using position + velocity control -->
-        <param name="kvff">0.01</param>
-
-        <!-- Required when using position + velocity + acceleration control -->
-        <param name="kaff">0.01</param>
-
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-    </joint>
-
-    <!-- Joint with torque (effort) control -->
-    <joint name="joint2">
-        <command_interface name="effort"/>
-
-        <state_interface name="position">
-            <param name="initial_value">1.0</param>
-        </state_interface>
-
-        <state_interface name="velocity">
-            <param name="initial_value">0.0</param>
-        </state_interface>
-    </joint>
-</ros2_control>
+```bash
+cd mujoco_ros2_control
+source /opt/ros/${ROS_DISTRO}/setup.bash
+colcon build
 ```
+
+## Usage
+
+See the [documentation](doc/index.rst) for usage.
+
+## Docker
+
+A basic containerized workflow is provided to test this package in isolation.
+For more information refer to the [docker documentation](docker/RUNNING_IN_DOCKER.md).
+
+## Future Work
+
+Here are several potential areas for future improvement:
+
+1. **Sensors:** Implement IMU sensors, and range sensors.
+
+2. **Loading Model From URDF:** Implement direct loading of models from URDF, eliminating the need to convert URDF files to XML.
+
+Feel free to suggest ideas for new features or improvements.

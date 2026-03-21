@@ -14,13 +14,13 @@
     <xacro:include filename="$(find at_dog_description)/xacro/ros2_control_real.xacro"/>
   </xacro:unless>
 
-  <!-- <joint name="imu_joint" type="fixed">
-    <parent link="trunk"/>
-    <child link="imu_link"/>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
+  <joint name="imu_main_joint" type="fixed">
+    <parent link="body_link"/>
+    <child link="imu_main_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.056203"/>
   </joint>
 
-  <link name="imu_link">
+  <link name="imu_main_link">
     <inertial>
       <mass value="0.001"/>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -39,6 +39,6 @@
         <box size=".001 .001 .001"/>
       </geometry>
     </collision>
-  </link> -->
+  </link>
 
 </robot>

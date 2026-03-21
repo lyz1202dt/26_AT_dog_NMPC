@@ -38,7 +38,7 @@
       <freejoint/>
       <inertial pos="6.3455e-05 0.0025357 0.056203" quat="0.999996 -0.000182 0.00272 -5.07e-05" mass="4.2135" diaginertia="0.011761 0.010952 0.0060638"/>
       <geom type="mesh" rgba="1 1 1 1" mesh="body_link"/>
-      <site name="imu" pos="0 0 0.056203" size="0.01"/>
+      <site name="imu_main_site" pos="0 0 0.056203" size="0.01"/>
       
       <body name="lf_link1" pos="0.1916 0.069987 0.061999" quat="0.707105 0 0.707108 0">
       <inertial pos="0.000574214 0.00884611 0.0444225" quat="0.521191 0.460379 0.475622 0.538697" mass="0.305259" diaginertia="0.000294539 0.000186896 0.000135452"/>
@@ -183,9 +183,9 @@
         <actuatorfrc name="rb_motor3_f" actuator="rb_motor3" noise="1e-3" />
 
         <!-- IMU (imu_main): orientation + acceleration + angular velocity -->
-        <accelerometer name="imu_main_accel" site="imu" />
-        <gyro name="imu_main_gyro" site="imu" />
-        <framequat name="imu_main_quat" objtype="site" objname="imu" />
+        <accelerometer name="imu_main_accel" site="imu_main_site" />
+        <gyro name="imu_main_gyro" site="imu_main_site" />
+        <framequat name="imu_main_quat" objtype="site" objname="imu_main_site" />
     </sensor>
 
 
