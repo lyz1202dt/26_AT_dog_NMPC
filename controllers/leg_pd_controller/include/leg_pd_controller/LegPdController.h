@@ -8,6 +8,7 @@
 #include "realtime_tools/realtime_buffer.h"
 #include <controller_interface/controller_interface.hpp>
 #include "std_msgs/msg/float64_multi_array.hpp"
+#include <unordered_map>
 
 
 namespace leg_pd_controller {
@@ -56,6 +57,7 @@ namespace leg_pd_controller {
 
         std::vector<std::string> state_interface_types_;
         std::vector<std::string> reference_interface_types_;
+        std::unordered_map<std::string, size_t> reference_interface_index_map_;
         realtime_tools::RealtimeBuffer<std::shared_ptr<DataType>> rt_buffer_ptr_;
 
         std::vector<std::reference_wrapper<hardware_interface::LoanedCommandInterface> >

@@ -1,25 +1,13 @@
-# Controller Manager configuration for Mujoco + Leg PD controller smoke testing.
+# Controller Manager configuration
 controller_manager:
   ros__parameters:
-    update_rate: 1000
-
-    joint_state_broadcaster:
-      type: joint_state_broadcaster/JointStateBroadcaster
-
-    imu_sensor_broadcaster:
-      type: imu_sensor_broadcaster/IMUSensorBroadcaster
+    update_rate: 500
 
     leg_pd_controller:
       type: leg_pd_controller/LegPdController
 
-imu_sensor_broadcaster:
-  ros__parameters:
-    sensor_name: "imu_main_imu"
-    frame_id: "body_link"
-
 leg_pd_controller:
   ros__parameters:
-    update_rate: 1000
     joints:
       - lf_joint1
       - lf_joint2
@@ -35,6 +23,13 @@ leg_pd_controller:
       - rb_joint3
 
     reference_interfaces:
+      - position
+      - velocity
+      - effort
+      - kp
+      - kd
+
+    command_interfaces:
       - effort
 
     state_interfaces:

@@ -4,6 +4,10 @@
 
 #include "leg_pd_controller/LegPdController.h"
 
+#include <cmath>
+#include <limits>
+#include <stdexcept>
+
 namespace leg_pd_controller {
     using config_type = controller_interface::interface_configuration_type;
 
@@ -12,19 +16,12 @@ namespace leg_pd_controller {
             joint_names_ = auto_declare<std::vector<std::string> >("joints", joint_names_);
             reference_interface_types_ =
                     auto_declare<std::vector<std::string> >("reference_interfaces", reference_interface_types_);
-            state_interface_types_ = auto_declare<std::vector<
-                std::string> >("state_interfaces", state_interface_types_);
+            state_interface_types_ =
+                    auto_declare<std::vector<std::string> >("state_interfaces", state_interface_types_);
         } catch (const std::exception &e) {
             fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
             return controller_interface::CallbackReturn::ERROR;
         }
-
-        const size_t joint_num = joint_names_.size();
-        joint_effort_command_.assign(joint_num, 0);
-        joint_position_command_.assign(joint_num, 0);
-        joint_velocities_command_.assign(joint_num, 0);
-        joint_kp_command_.assign(joint_num, 0);
-        joint_kd_command_.assign(joint_num, 0);
 
         return CallbackReturn::SUCCESS;
     }
@@ -45,7 +42,7 @@ namespace leg_pd_controller {
         conf.names.reserve(joint_names_.size() * state_interface_types_.size());
         for (const auto &joint_name: joint_names_) {
             for (const auto &interface_type: state_interface_types_) {
-                conf.names.push_back(joint_name + "/" += interface_type);
+                conf.names.push_back(joint_name + "/" + interface_type);
             }
         }
         return conf;
@@ -53,7 +50,41 @@ namespace leg_pd_controller {
 
     controller_interface::CallbackReturn LegPdController::on_configure(
         const rclcpp_lifecycle::State & /*previous_state*/) {
-        reference_interfaces_.resize(joint_names_.size() * 5, std::numeric_limits<double>::quiet_NaN());
+        joint_names_ = get_node()->get_parameter("joints").as_string_array();
+        state_interface_types_ = get_node()->get_parameter("state_interfaces").as_string_array();
+        reference_interface_types_ = get_node()->get_parameter("reference_interfaces").as_string_array();
+
+        if (joint_names_.empty()) {
+            RCLCPP_ERROR(get_node()->get_logger(), "Parameter 'joints' is empty.");
+            return CallbackReturn::ERROR;
+        }
+
+        if (state_interface_types_.empty()) {
+            RCLCPP_ERROR(get_node()->get_logger(), "Parameter 'state_interfaces' is empty.");
+            return CallbackReturn::ERROR;
+        }
+
+        if (reference_interface_types_.empty()) {
+            reference_interface_types_ = {"position", "velocity", "effort", "kp", "kd"};
+            RCLCPP_WARN(
+                get_node()->get_logger(),
+                "Parameter 'reference_interfaces' is empty. Falling back to position/velocity/effort/kp/kd.");
+        }
+
+        const size_t joint_num = joint_names_.size();
+        joint_effort_command_.assign(joint_num, 0.0);
+        joint_position_command_.assign(joint_num, 0.0);
+        joint_velocities_command_.assign(joint_num, 0.0);
+        joint_kp_command_.assign(joint_num, 0.0);
+        joint_kd_command_.assign(joint_num, 0.0);
+
+        reference_interface_index_map_.clear();
+        for (size_t i = 0; i < reference_interface_types_.size(); ++i) {
+            reference_interface_index_map_[reference_interface_types_[i]] = i;
+        }
+
+        reference_interfaces_.assign(
+            joint_num * reference_interface_types_.size(), std::numeric_limits<double>::quiet_NaN());
         return CallbackReturn::SUCCESS;
     }
 
@@ -63,14 +94,15 @@ namespace leg_pd_controller {
         joint_position_state_interface_.clear();
         joint_velocity_state_interface_.clear();
 
-        // assign effort command interface
         for (auto &interface: command_interfaces_) {
             joint_effort_command_interface_.emplace_back(interface);
         }
 
-        // assign state interfaces
         for (auto &interface: state_interfaces_) {
-            state_interface_map_[interface.get_interface_name()]->push_back(interface);
+            const auto it = state_interface_map_.find(interface.get_interface_name());
+            if (it != state_interface_map_.end()) {
+                it->second->push_back(interface);
+            }
         }
 
         return CallbackReturn::SUCCESS;
@@ -88,28 +120,35 @@ namespace leg_pd_controller {
 
     controller_interface::return_type LegPdController::update_and_write_commands(
         const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/) {
+        const auto ref_type_count = reference_interface_types_.size();
         if (joint_names_.size() != joint_effort_command_.size() ||
             joint_names_.size() != joint_kp_command_.size() ||
             joint_names_.size() != joint_position_command_.size() ||
             joint_names_.size() != joint_position_state_interface_.size() ||
             joint_names_.size() != joint_velocity_state_interface_.size() ||
-            joint_names_.size() != joint_effort_command_interface_.size()) {
-            std::cout << "joint_names_.size() = " << joint_names_.size() << std::endl;
-            std::cout << "joint_effort_command_.size() = " << joint_effort_command_.size() << std::endl;
-            std::cout << "joint_kp_command_.size() = " << joint_kp_command_.size() << std::endl;
-            std::cout << "joint_position_command_.size() = " << joint_position_command_.size() << std::endl;
-            std::cout << "joint_position_state_interface_.size() = " << joint_position_state_interface_.size() <<
-                    std::endl;
-            std::cout << "joint_velocity_state_interface_.size() = " << joint_velocity_state_interface_.size() <<
-                    std::endl;
-            std::cout << "joint_effort_command_interface_.size() = " << joint_effort_command_interface_.size() <<
-                    std::endl;
-
+            joint_names_.size() != joint_effort_command_interface_.size() ||
+            reference_interfaces_.size() != joint_names_.size() * ref_type_count) {
             throw std::runtime_error("Mismatch in vector sizes in update_and_write_commands");
         }
 
         for (size_t i = 0; i < joint_names_.size(); ++i) {
-            // PD Controller
+            const auto ref_base = i * ref_type_count;
+            auto get_reference_value = [&](const std::string &interface_name, double default_value) {
+                const auto it = reference_interface_index_map_.find(interface_name);
+                if (it == reference_interface_index_map_.end()) {
+                    return default_value;
+                }
+
+                const double value = reference_interfaces_[ref_base + it->second];
+                return std::isnan(value) ? default_value : value;
+            };
+
+            joint_position_command_[i] = get_reference_value("position", 0.0);
+            joint_velocities_command_[i] = get_reference_value("velocity", 0.0);
+            joint_effort_command_[i] = get_reference_value("effort", 0.0);
+            joint_kp_command_[i] = get_reference_value("kp", 0.0);
+            joint_kd_command_[i] = get_reference_value("kd", 0.0);
+
             const double torque = joint_effort_command_[i] + joint_kp_command_[i] * (
                                       joint_position_command_[i] - joint_position_state_interface_[i].get().get_value())
                                   +
@@ -124,18 +163,15 @@ namespace leg_pd_controller {
 
     std::vector<hardware_interface::CommandInterface> LegPdController::on_export_reference_interfaces() {
         std::vector<hardware_interface::CommandInterface> reference_interfaces;
+        reference_interfaces.reserve(joint_names_.size() * reference_interface_types_.size());
 
-        int ind = 0;
         std::string controller_name = get_node()->get_name();
+        size_t ind = 0;
         for (const auto &joint_name: joint_names_) {
-            std::cout << joint_name << std::endl;
-            reference_interfaces.emplace_back(controller_name, joint_name + "/position", &joint_position_command_[ind]);
-            reference_interfaces.emplace_back(controller_name, joint_name + "/velocity",
-                                              &joint_velocities_command_[ind]);
-            reference_interfaces.emplace_back(controller_name, joint_name + "/effort", &joint_effort_command_[ind]);
-            reference_interfaces.emplace_back(controller_name, joint_name + "/kp", &joint_kp_command_[ind]);
-            reference_interfaces.emplace_back(controller_name, joint_name + "/kd", &joint_kd_command_[ind]);
-            ind++;
+            for (const auto &interface_type: reference_interface_types_) {
+                reference_interfaces.emplace_back(
+                    controller_name, joint_name + "/" + interface_type, &reference_interfaces_[ind++]);
+            }
         }
 
         return reference_interfaces;

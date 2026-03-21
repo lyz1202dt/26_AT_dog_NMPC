@@ -1,94 +1,245 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16)
 project(mujoco_ros2_control)
 
-# Default to C++14
+# Set default C standards
+if(NOT CMAKE_C_STANDARD)
+    set(CMAKE_C_STANDARD 99)
+endif()
+
+# Set default C++ standards
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_STANDARD 17)
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
-endif()
+# Enable debug build
+set(CMAKE_BUILD_TYPE Release)
 
-# find dependencies
-find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(hardware_interface REQUIRED)
-find_package(pluginlib REQUIRED)
-find_package(controller_manager REQUIRED)
-find_package(joint_limits REQUIRED)
-find_package(urdf REQUIRED)
-find_package(glfw3 REQUIRED)
-find_package(Eigen3 REQUIRED)
-find_package(control_toolbox REQUIRED)
+# Export compile commands for IDEs
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-set(THIS_PACKAGE_DEPENDS
-  ament_cmake
-  rclcpp
-  hardware_interface
-  pluginlib
-  controller_manager
-  joint_limits
-  urdf
-  glfw3
-  control_toolbox
+# Set OpenGL preferences
+set(OpenGL_GL_PREFERENCE LEGACY)
+
+# Package dependencies
+set(THIS_PACKAGE_INCLUDE_DEPENDS
+    ament_cmake
+    rclcpp
+    std_msgs
+    geometry_msgs
+    rosgraph_msgs
+    controller_manager
+    hardware_interface
+    urdf
+    ament_lint_auto
+    realtime_tools
+    OpenCV
+    PCL
+    pcl_conversions
+    cv_bridge
+    generate_parameter_library
+    Eigen3
+    tf2_ros
 )
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-find_package(mujoco QUIET)
-if(mujoco_FOUND)
-  message(STATUS "Mujoco build from source has been found")
-  set(MUJOCO_LIB mujoco::mujoco)
-  set(MUJOCO_INCLUDE_DIR ${MUJOCO_INCLUDE_DIR})
-elseif(DEFINED ENV{MUJOCO_DIR})
-  message(STATUS "Mujoco build from source has not been found. Attempting to find the binary in $ENV{MUJOCO_DIR} instead.")
-  find_library(MUJOCO_LIB mujoco HINTS $ENV{MUJOCO_DIR}/lib)
-  if(NOT MUJOCO_LIB)
-    message(FATAL_ERROR "Failed to find binary in $ENV{MUJOCO_DIR}")
-  endif()
-  set(MUJOCO_INCLUDE_DIR $ENV{MUJOCO_DIR}/include)
-else()
-  message(FATAL_ERROR "Failed to find mujoco with find_package.
-  Either build and install mujoco from source or set the MUJOCO_DIR environment variable to tell CMake where to find the binary install. ")
-endif()
+foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
+    find_package(${Dependency} REQUIRED)
+endforeach()
 
+# Set Eigen3
+set(EIGEN3_FOUND TRUE)
+set(EIGEN3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
+
+# Fetch MuJoCo
+include(FetchContent)
+FetchContent_Declare(
+  mujoco
+  GIT_REPOSITORY https://github.com/google-deepmind/mujoco.git
+  GIT_TAG 3.2.7  # MuJoCo version
+)
+
+# Optionally set MuJoCo build options
+set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+set(MUJOCO_TEST_PYTHON_UTIL OFF CACHE BOOL "" FORCE)
+set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
+set(BUILD_SIMULATE ON CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(mujoco)
+
+# Install the ccd-config.cmake to the appropriate location
+install(FILES ${CMAKE_BINARY_DIR}/_deps/ccd-build/ccd-config.cmake
+        DESTINATION share/${PROJECT_NAME}/cmake)
+
+# Set LibSimulate usage flag
+set(USE_LIBSIMULATE ON CACHE BOOL "Use LibSimulate" FORCE)
+message("Setting USE_LIBSIMULATE to: ${USE_LIBSIMULATE}")
+
+# Configure the header file with CMake variables
+configure_file(cmake/config.h.in ${CMAKE_BINARY_DIR}/config.h)
+
+# Add compile definitions and directories
+add_definitions(
+    ${rclcpp_DEFINITIONS}
+    ${mujoco_DEFINITIONS}
+)
+
+link_directories(
+    ${rclcpp_LIBRARY_DIRS}
+    ${ament_cmake_DIRS}
+    ${PCL_LIBRARY_DIRS}
+)
+
+include_directories(
+    include
+    ${rclcpp_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
+    ${pcl_conversions_INCLUDE_DIRS}
+    ${CMAKE_BINARY_DIR}/_deps/mujoco-src/include
+    ${CMAKE_BINARY_DIR}/_deps/mujoco-src/simulate
+    ${CMAKE_BINARY_DIR}
+)
+
+# Generate parameter libraries
+generate_parameter_library(${PROJECT_NAME}_parameters
+    src/${PROJECT_NAME}_parameters.yaml
+)
+
+generate_parameter_library(mujoco_rgbd_camera_parameters
+    src/mujoco_rgbd_camera_parameters.yaml
+)
+
+# Add system plugin
 add_library(mujoco_system_plugins SHARED src/mujoco_system.cpp)
-ament_target_dependencies(mujoco_system_plugins ${THIS_PACKAGE_DEPENDS})
-target_link_libraries(mujoco_system_plugins ${MUJOCO_LIB})
-target_include_directories(mujoco_system_plugins
-  PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-    ${MUJOCO_INCLUDE_DIR}
-    ${EIGEN3_INCLUDE_DIR})
-
-install(TARGETS
-  mujoco_system_plugins
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
+ament_target_dependencies(mujoco_system_plugins
+    hardware_interface
+    rclcpp
+    urdf
 )
 
-# TODO: make it simple
-add_executable(mujoco_ros2_control
-  src/mujoco_ros2_control_node.cpp
-  src/mujoco_rendering.cpp
-  src/mujoco_ros2_control.cpp
-  src/mujoco_cameras.cpp
+# Add executable for the main ROS2 control node
+add_executable(${PROJECT_NAME}
+    src/mujoco_ros2_control_plugin.cpp
+    src/mujoco_depth_camera.cpp
+    src/imu_sensor.cpp
+    src/pose_sensor.cpp
+    src/wrench_sensor.cpp
+    src/mujoco_ros2_sensors.cpp
 )
-ament_target_dependencies(mujoco_ros2_control ${THIS_PACKAGE_DEPENDS})
-target_link_libraries(mujoco_ros2_control ${MUJOCO_LIB} glfw)
-target_include_directories(mujoco_ros2_control
-  PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-    ${MUJOCO_INCLUDE_DIR}
-    ${EIGEN3_INCLUDE_DIR})
+
+ament_target_dependencies(${PROJECT_NAME}
+    controller_manager
+    hardware_interface
+    rclcpp
+    urdf
+    realtime_tools
+    cv_bridge
+    PCL
+    pcl_conversions
+    tf2_ros
+)
+
+# Link libraries to the main executable
+target_link_libraries(${PROJECT_NAME}
+    mujoco::mujoco
+    glfw
+    ${PCL_LIBRARIES}
+    ${OpenCV_LIBS}
+    ${PROJECT_NAME}_parameters
+    mujoco_rgbd_camera_parameters
+)
+
+# Add GUI simulation library
+add_library(simulate_gui SHARED src/simulate_gui.cpp)
+target_link_libraries(simulate_gui PUBLIC glfw)
+target_link_libraries(simulate_gui PRIVATE
+    mujoco::mujoco
+    mujoco::libsimulate
+    mujoco::platform_ui_adapter
+    glfw
+)
+
+# Link simulate_gui to the main project
+target_link_libraries(${PROJECT_NAME} simulate_gui)
+
+# Install targets
+install(TARGETS
+    simulate_gui
+    DESTINATION lib
+)
 
 install(TARGETS
-  mujoco_ros2_control
-  DESTINATION lib/${PROJECT_NAME})
+    ${PROJECT_NAME}
+    DESTINATION lib/${PROJECT_NAME}
+)
+
+install(TARGETS
+    mujoco_system_plugins
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+)
+
+# Install MJCF models
+install(DIRECTORY mjcf DESTINATION share/${PROJECT_NAME}/)
+
+# Install Python scripts
+ament_python_install_package(scripts)
+install(PROGRAMS
+    scripts/xacro2mjcf.py
+    scripts/urdf2mjcf.py
+    DESTINATION lib/${PROJECT_NAME}
+)
+
+# Export dependencies
+ament_export_include_directories(include)
+ament_export_dependencies(ament_cmake)
+ament_export_dependencies(rclcpp)
+ament_export_libraries(
+    ${PROJECT_NAME}
+    mujoco_system_plugins
+)
 
 pluginlib_export_plugin_description_file(mujoco_ros2_control mujoco_system_plugins.xml)
+
+# Finalize package
 ament_package()
+
+#############
+## Testing ##
+#############
+set(BUILD_TESTING ON CACHE BOOL "" FORCE) # Set to off/ comment out to disable building tests
+if(BUILD_TESTING)
+    ament_lint_auto_find_test_dependencies()
+    find_package(ament_cmake_ros REQUIRED)
+    find_package(launch_testing_ament_cmake REQUIRED)
+    install(DIRECTORY test/data/ DESTINATION share/${PROJECT_NAME}/test_data)
+
+    function(add_ros_isolated_launch_test path)
+        set(RUNNER "${ament_cmake_ros_DIR}/run_test_isolated.py")
+        add_launch_test("${path}" RUNNER "${RUNNER}" ${ARGN})
+    endfunction()
+
+    add_ros_isolated_launch_test(test/simple_launch.test.py)
+endif()
+
+#############
+## Doxygen ##
+#############
+find_package(Doxygen)
+if(BUILD_DOC AND DOXYGEN_FOUND)
+    set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
+    set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+    configure_file(${doxyfile_in} ${doxyfile} @ONLY)
+    message("Doxygen build started.")
+    add_custom_target(doc ALL
+        COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM)
+    install(DIRECTORY doc/images DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/doc)
+else()
+    if(NOT DOXYGEN_FOUND)
+        message("Doxygen needs to be installed to generate the documentation")
+    endif()
+endif()
