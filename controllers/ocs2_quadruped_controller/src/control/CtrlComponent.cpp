@@ -37,7 +37,7 @@ namespace ocs2::legged_robot
 
 
         const std::string package_share_directory = ament_index_cpp::get_package_share_directory(robot_pkg_);
-        urdf_file_ = package_share_directory + "/urdf/robot.urdf";
+        urdf_file_ = package_share_directory + "/model/dog.urdf";
         task_file_ = package_share_directory + "/config/ocs2/task.info";
         reference_file_ = package_share_directory + "/config/ocs2/reference.info";
         gait_file_ = package_share_directory + "/config/ocs2/gait.info";
@@ -85,7 +85,7 @@ namespace ocs2::legged_robot
                 legged_interface_->getPinocchioInterface(),
                 legged_interface_->getCentroidalModelInfo(),
                 *ee_kinematics_, ctrl_interfaces_,
-                node_);
+                node_,(ctrl_interfaces_.foot_force_state_interface_.size()!=0));
             dynamic_cast<KalmanFilterEstimate&>(*estimator_).loadSettings(task_file_, verbose_);
             RCLCPP_INFO(node_->get_logger(), "Using Kalman Filter Estimator");
         }

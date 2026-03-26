@@ -3,32 +3,46 @@ import os
 import xacro
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, OpaqueFunction, IncludeLaunchDescription, RegisterEventHandler
-from launch.event_handlers import OnProcessExit
-from launch.substitutions import PathJoinSubstitution
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, OpaqueFunction, RegisterEventHandler
+from launch.event_handlers import OnProcessStart, OnProcessExit
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
 
 package_controller = "ocs2_quadruped_controller"
 
+
 def launch_setup(context, *args, **kwargs):
-    package_description = context.launch_configurations['pkg_description']
-    pkg_path = os.path.join(get_package_share_directory(package_description))
+    package_description = LaunchConfiguration("pkg_description").perform(context)
 
-    xacro_file = os.path.join(pkg_path, 'xacro', 'robot.xacro')
-    robot_description = xacro.process_file(xacro_file).toxml()
+    pkg_path = get_package_share_directory(package_description)
+    xacro_file = os.path.join(pkg_path, "xacro", "robot.xacro")
+    mujoco_model_path = os.path.join(pkg_path, "model", "scene.xml")
+    controller_config_file = os.path.join(pkg_path, "config", "robot_mujoco_sim.yaml")
+    rviz_config_file = os.path.join(get_package_share_directory(package_controller), "config", "visualize_ocs2.rviz")
 
-    robot_controllers = PathJoinSubstitution(
-        [
-            FindPackageShare(package_description),
-            "config",
-            "robot_control.yaml",
+    doc = xacro.parse(open(xacro_file))
+    xacro.process_doc(doc, mappings={"SIMULATE": "true"})
+    robot_description = {'robot_description': doc.toxml()}
+
+    node_mujoco_ros2_control = Node(
+        package="mujoco_ros2_control",
+        executable="mujoco_ros2_control",
+        output="screen",
+        parameters=[
+            robot_description,
+            controller_config_file,
+            {'mujoco_model_path': mujoco_model_path}
         ]
     )
 
-    rviz_config_file = os.path.join(get_package_share_directory(package_controller), "config", "visualize_ocs2.rviz")
+    node_robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        output='screen',
+        parameters=[robot_description]
+    )
 
-    rviz = Node(
+    node_rviz = Node(
         package='rviz2',
         executable='rviz2',
         name='rviz_ocs2',
@@ -36,78 +50,71 @@ def launch_setup(context, *args, **kwargs):
         arguments=["-d", rviz_config_file]
     )
 
-    robot_state_publisher = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name='robot_state_publisher',
-        parameters=[
-            {
-                'publish_frequency': 20.0,
-                'use_tf_static': True,
-                'robot_description': robot_description,
-                'ignore_timestamp': True
-            }
-        ],
+    load_joint_state_controller = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'joint_state_broadcaster'],
+        output='screen'
     )
 
-    controller_manager = Node(
-        package="controller_manager",
-        executable="ros2_control_node",
-        parameters=[robot_controllers],
-        remappings=[
-            ("~/robot_description", "/robot_description"),
-        ],
-        output="both",
+    load_imu_sensor_broadcaster = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'imu_sensor_broadcaster'],
+        output='screen'
     )
 
-    joint_state_publisher = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["joint_state_broadcaster",
-                   "--controller-manager", "/controller_manager"],
+    # 级联控制器架构：ocs2(上层) -> leg_pd(底层) -> mujoco
+    # 先加载下层leg_pd_controller导出reference interfaces，再加载上层ocs2控制器
+    load_leg_pd_controller = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'leg_pd_controller'],
+        output='screen'
     )
 
-    imu_sensor_broadcaster = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["imu_sensor_broadcaster",
-                   "--controller-manager", "/controller_manager"],
-    )
-
-    ocs2_controller = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["ocs2_quadruped_controller", "--controller-manager", "/controller_manager"]
+    load_ocs2_quadruped_controller = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'ocs2_quadruped_controller'],
+        output='screen'
     )
 
     return [
-        rviz,
-        robot_state_publisher,
-        controller_manager,
-        joint_state_publisher,
         RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=joint_state_publisher,
-                on_exit=[imu_sensor_broadcaster],
+            event_handler=OnProcessStart(
+                target_action=node_mujoco_ros2_control,
+                on_start=[load_joint_state_controller],
             )
         ),
         RegisterEventHandler(
             event_handler=OnProcessExit(
-                target_action=imu_sensor_broadcaster,
-                on_exit=[ocs2_controller],
+                target_action=load_joint_state_controller,
+                on_exit=[load_imu_sensor_broadcaster],
             )
         ),
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=load_imu_sensor_broadcaster,
+                on_exit=[load_leg_pd_controller],
+            )
+        ),
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=load_leg_pd_controller,
+                on_exit=[load_ocs2_quadruped_controller],
+            )
+        ),
+        node_mujoco_ros2_control,
+        node_robot_state_publisher,
+        node_rviz
     ]
 
 
 def generate_launch_description():
-    pkg_description = DeclareLaunchArgument(
-        'pkg_description',
-        default_value='go2_description',
-        description='package for robot description'
+    return LaunchDescription(
+        [
+            DeclareLaunchArgument(
+                "pkg_description",
+                default_value="at_dog_description",
+                description="Package that provides the robot xacro/model/config files.",
+            ),
+            OpaqueFunction(function=launch_setup),
+        ]
     )
-
-    return LaunchDescription([
-        pkg_description,
-        OpaqueFunction(function=launch_setup),
-    ])

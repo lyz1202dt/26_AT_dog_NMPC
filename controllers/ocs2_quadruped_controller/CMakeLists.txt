@@ -39,6 +39,7 @@ add_library(${PROJECT_NAME} SHARED
         src/FSM/StateOCS2.cpp
 
         src/estimator/GroundTruth.cpp
+        src/estimator/ContactEstimater.cpp
         src/estimator/LinearKalmanFilter.cpp
         src/estimator/StateEstimateBase.cpp
         src/estimator/FromOdomTopic.cpp

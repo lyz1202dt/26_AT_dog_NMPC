@@ -17,8 +17,14 @@ set(dependencies
 find_package(ament_cmake REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(ocs2_legged_robot_ros REQUIRED)
-find_package(ocs2_raisim_core REQUIRED)
+find_package(ocs2_raisim_core QUIET)
 find_package(grid_map_msgs REQUIRED)
+
+if (NOT ocs2_raisim_core_FOUND)
+    message(WARNING "ocs2_raisim_core is unavailable, likely because RaiSim is not installed. Skipping package ${PROJECT_NAME}.")
+    ament_package()
+    return()
+endif ()
 
 ###########
 ## Build ##
@@ -74,19 +80,21 @@ install(DIRECTORY config launch
 #############
 ## Testing ##
 #############
-find_package(ament_lint_auto REQUIRED)
-ament_lint_auto_find_test_dependencies()
-find_package(ament_cmake_gtest)
+if (BUILD_TESTING)
+    find_package(ament_lint_auto REQUIRED)
+    ament_lint_auto_find_test_dependencies()
+    find_package(ament_cmake_gtest)
 
-ament_add_gtest(${PROJECT_NAME}_test
-        test/testLeggedRobotRaisimConversions.cpp
-)
-ament_target_dependencies(${PROJECT_NAME}_test
-        ${dependencies}
-)
-target_link_libraries(${PROJECT_NAME}_test
-        ${PROJECT_NAME}
-)
+    ament_add_gtest(${PROJECT_NAME}_test
+            test/testLeggedRobotRaisimConversions.cpp
+    )
+    ament_target_dependencies(${PROJECT_NAME}_test
+            ${dependencies}
+    )
+    target_link_libraries(${PROJECT_NAME}_test
+            ${PROJECT_NAME}
+    )
+endif ()
 
 ament_export_dependencies(${dependencies})
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)

@@ -39,6 +39,12 @@ ocs2_quadruped_controller:
       - rb_joint2
       - rb_joint3
 
+    feet:
+      - lf_link4
+      - rf_link4
+      - lb_link4
+      - rb_link4
+
     command_interfaces:
       - effort
       - position

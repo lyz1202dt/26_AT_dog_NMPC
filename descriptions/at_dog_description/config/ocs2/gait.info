@@ -1,3 +1,6 @@
+; OCS2 gait mode names use the fixed convention {LF, RF, LH, RH}.
+; For at_dog, LH/RH correspond to the rear legs lb/rb in the URDF and controller config.
+
 list
 {
   [0] stance

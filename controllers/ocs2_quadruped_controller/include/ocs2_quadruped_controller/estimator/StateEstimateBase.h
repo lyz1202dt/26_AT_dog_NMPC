@@ -30,6 +30,8 @@ namespace ocs2::legged_robot
 
         virtual void updateContact();
 
+        virtual void updateContact(const contact_flag_t& legs_state);   //从外部设置腿的接触状态
+
         virtual void updateImu();
 
         virtual vector_t update(const rclcpp::Time& time, const rclcpp::Duration& period) = 0;

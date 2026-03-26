@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ContactEstimater.h"
 #include "StateEstimateBase.h"
 
 #include <ocs2_centroidal_model/CentroidalModelPinocchioMapping.h>
@@ -17,7 +18,7 @@ namespace ocs2::legged_robot {
         KalmanFilterEstimate(PinocchioInterface pinocchio_interface, CentroidalModelInfo info,
                              const PinocchioEndEffectorKinematics &ee_kinematics,
                              CtrlInterfaces &ctrl_component,
-                             const rclcpp_lifecycle::LifecycleNode::SharedPtr &node);
+                             const rclcpp_lifecycle::LifecycleNode::SharedPtr &node,bool has_foot_sensor=false);
 
         vector_t update(const rclcpp::Time &time, const rclcpp::Duration &period) override;
 
@@ -28,8 +29,10 @@ namespace ocs2::legged_robot {
 
         PinocchioInterface pinocchio_interface_;
         std::unique_ptr<PinocchioEndEffectorKinematics> ee_kinematics_;
+        ContactEstimater contact_estimater_;
 
         vector_t feet_heights_;
+        bool has_foot_sensor{false};
 
         // Config
         scalar_t foot_radius_ = 0.02;

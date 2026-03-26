@@ -51,6 +51,11 @@ namespace ocs2::legged_robot
         }
     }
 
+    void StateEstimateBase::updateContact(const contact_flag_t& legs_state)
+    {
+        contact_flag_ = legs_state;
+    }
+
     void StateEstimateBase::updateImu()
     {
         quat_ = {

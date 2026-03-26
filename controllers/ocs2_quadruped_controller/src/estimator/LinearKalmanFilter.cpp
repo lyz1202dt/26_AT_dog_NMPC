@@ -17,11 +17,13 @@ namespace ocs2::legged_robot {
                                                CentroidalModelInfo info,
                                                const PinocchioEndEffectorKinematics &ee_kinematics,
                                                CtrlInterfaces &ctrl_component,
-                                               const rclcpp_lifecycle::LifecycleNode::SharedPtr &node)
+                                               const rclcpp_lifecycle::LifecycleNode::SharedPtr &node,
+                                               bool has_foot_sensor)
         : StateEstimateBase(std::move(info), ctrl_component,
                             node),
           pinocchio_interface_(std::move(pinocchio_interface)),
           ee_kinematics_(ee_kinematics.clone()),
+          contact_estimater_(ctrl_component, pinocchio_interface_, ee_kinematics, info_),
           numContacts_(info_.numThreeDofContacts + info_.numSixDofContacts),
           dimContacts_(3 * numContacts_),
           numState_(6 + dimContacts_),
@@ -48,13 +50,19 @@ namespace ocs2::legged_robot {
         r_.setIdentity(numObserve_, numObserve_);
         feet_heights_.setZero(numContacts_);
 
-        ee_kinematics_->setPinocchioInterface(pinocchio_interface_);
+        this->has_foot_sensor=has_foot_sensor;
+
         initPublishers();
     }
 
     vector_t KalmanFilterEstimate::update(const rclcpp::Time &time, const rclcpp::Duration &period) {
         updateJointStates();
-        updateContact();
+
+        if(has_foot_sensor)
+            updateContact();
+        else
+            updateContact(contact_estimater_.state_update(time, period, rbd_state_(info_.generalizedCoordinatesNum)));
+        
         updateImu();
 
         scalar_t dt = period.seconds();

@@ -21,7 +21,13 @@ find_package(Python COMPONENTS Interpreter Development)
 find_package(pybind11 REQUIRED)
 
 find_package(ocs2_mpcnet_core REQUIRED)
-find_package(ocs2_legged_robot_raisim REQUIRED)
+find_package(ocs2_legged_robot_raisim QUIET)
+
+if (NOT ocs2_legged_robot_raisim_FOUND)
+    message(WARNING "ocs2_legged_robot_raisim is unavailable, likely because RaiSim is not installed. Skipping package ${PROJECT_NAME}.")
+    ament_package()
+    return()
+endif ()
 
 ###########
 ## Build ##

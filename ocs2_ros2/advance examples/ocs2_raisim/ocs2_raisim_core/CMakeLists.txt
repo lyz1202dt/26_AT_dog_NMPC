@@ -15,7 +15,13 @@ set(dependencies
 find_package(ament_cmake REQUIRED)
 
 find_package(ocs2_oc REQUIRED)
-find_package(raisim REQUIRED)
+find_package(raisim QUIET)
+
+if (NOT raisim_FOUND)
+    message(WARNING "RaiSim not found. Skipping package ${PROJECT_NAME}. Set raisim_DIR or CMAKE_PREFIX_PATH if you want to build the RaiSim demos.")
+    ament_package()
+    return()
+endif ()
 
 ###########
 ## Build ##

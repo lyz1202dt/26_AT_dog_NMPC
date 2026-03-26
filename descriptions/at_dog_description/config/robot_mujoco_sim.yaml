@@ -14,6 +14,9 @@ controller_manager:
     ocs2_quadruped_controller:
       type: ocs2_quadruped_controller/Ocs2QuadrupedController
 
+    leg_pd_controller:
+      type: leg_pd_controller/LegPdController
+
 imu_sensor_broadcaster:
   ros__parameters:
     sensor_name: imu_main_imu
@@ -23,7 +26,8 @@ ocs2_quadruped_controller:
   ros__parameters:
     update_rate: 500  # Hz
     robot_pkg: "at_dog_description"
-#    default_kd: 3.5
+    # 将ocs2输出写入leg_pd_controller导出的reference interfaces，形成级联控制
+    command_prefix: "leg_pd_controller"
     joints:
       - lf_joint1
       - lf_joint2
@@ -38,15 +42,18 @@ ocs2_quadruped_controller:
       - rb_joint2
       - rb_joint3
 
-    reference_interfaces:
+    feet:
+      - lf_link4
+      - rf_link4
+      - lb_link4
+      - rb_link4
+
+    command_interfaces:
       - position
       - velocity
       - effort
       - kp
       - kd
-
-    command_interfaces:
-      - effort
 
     state_interfaces:
       - position
@@ -65,3 +72,39 @@ ocs2_quadruped_controller:
       - linear_acceleration.x
       - linear_acceleration.y
       - linear_acceleration.z
+
+
+leg_pd_controller:
+  ros__parameters:
+    joints:
+      - lf_joint1
+      - lf_joint2
+      - lf_joint3
+      - rf_joint1
+      - rf_joint2
+      - rf_joint3
+      - lb_joint1
+      - lb_joint2
+      - lb_joint3
+      - rb_joint1
+      - rb_joint2
+      - rb_joint3
+
+    # leg_pd作为底层控制器，从ocs2读取reference，输出effort到硬件
+    command_interfaces:
+      - effort
+
+    state_interfaces:
+      - position
+      - velocity
+      - effort
+    
+    # 从ocs2_quadruped_controller读取参考轨迹
+    reference_interfaces:
+      - position
+      - velocity  
+      - effort
+      - kp
+      - kd
+    
+    reference_controller: ocs2_quadruped_controller
