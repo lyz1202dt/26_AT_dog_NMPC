@@ -19,6 +19,7 @@
     <depend>ocs2_centroidal_model</depend>
 
     <test_depend>ament_cmake_gtest</test_depend>
+    <test_depend>ocs2_robotic_assets</test_depend>
 
     <export>
         <build_type>ament_cmake</build_type>

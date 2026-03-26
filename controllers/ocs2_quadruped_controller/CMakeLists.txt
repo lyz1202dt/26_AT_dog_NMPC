@@ -14,6 +14,7 @@ set(CONTROLLER_INCLUDE_DEPENDS
         controller_interface
         controller_common
 
+        ocs2_legged_robot
         ocs2_legged_robot_ros
         ocs2_self_collision
         control_input_msgs

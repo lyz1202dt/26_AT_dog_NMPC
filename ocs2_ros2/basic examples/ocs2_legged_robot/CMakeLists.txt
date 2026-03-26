@@ -102,20 +102,23 @@ ament_lint_auto_find_test_dependencies()
 
 if (BUILD_TESTING)
     find_package(ament_cmake_gtest)
+    find_package(ocs2_robotic_assets QUIET)
 
-    ament_add_gtest(${PROJECT_NAME}_test
-            test/AnymalFactoryFunctions.cpp
-            test/constraint/testEndEffectorLinearConstraint.cpp
-            test/constraint/testFrictionConeConstraint.cpp
-            test/constraint/testZeroForceConstraint.cpp
-    )
-    target_include_directories(${PROJECT_NAME}_test PRIVATE
-            test/include
-            ${PROJECT_BINARY_DIR}/include
-    )
-    ament_target_dependencies(${PROJECT_NAME}_test ${dependencies})
-    target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
-    target_compile_options(${PROJECT_NAME}_test PRIVATE ${FLAGS})
+    if (ocs2_robotic_assets_FOUND)
+        ament_add_gtest(${PROJECT_NAME}_test
+                test/AnymalFactoryFunctions.cpp
+                test/constraint/testEndEffectorLinearConstraint.cpp
+                test/constraint/testFrictionConeConstraint.cpp
+                test/constraint/testZeroForceConstraint.cpp
+        )
+        target_include_directories(${PROJECT_NAME}_test PRIVATE
+                test/include
+                ${PROJECT_BINARY_DIR}/include
+        )
+        ament_target_dependencies(${PROJECT_NAME}_test ${dependencies} ocs2_robotic_assets)
+        target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
+        target_compile_options(${PROJECT_NAME}_test PRIVATE ${FLAGS})
+    endif ()
 endif ()
 
 ament_package()

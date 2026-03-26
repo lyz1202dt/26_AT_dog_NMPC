@@ -5,13 +5,11 @@ set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(dependencies
-        ocs2_robotic_assets
         ocs2_pinocchio_interface
 )
 
 find_package(ament_cmake REQUIRED)
 
-find_package(ocs2_robotic_assets REQUIRED)
 find_package(ocs2_pinocchio_interface REQUIRED)
 
 ###########
@@ -63,15 +61,18 @@ ament_lint_auto_find_test_dependencies()
 
 if (BUILD_TESTING)
     find_package(ament_cmake_gtest REQUIRED)
+    find_package(ocs2_robotic_assets QUIET)
 
-    ament_add_gtest(${PROJECT_NAME}_test
-            # test/testAccessMethods.cpp
-            test/testAnymalCentroidalModel.cpp
-    )
-    ament_target_dependencies(${PROJECT_NAME}_test ${dependencies})
-    target_include_directories(${PROJECT_NAME}_test PRIVATE test/include)
-    target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
-    target_compile_options(${PROJECT_NAME}_test PUBLIC ${FLAGS})
+    if (ocs2_robotic_assets_FOUND)
+        ament_add_gtest(${PROJECT_NAME}_test
+                # test/testAccessMethods.cpp
+                test/testAnymalCentroidalModel.cpp
+        )
+        ament_target_dependencies(${PROJECT_NAME}_test ${dependencies} ocs2_robotic_assets)
+        target_include_directories(${PROJECT_NAME}_test PRIVATE test/include)
+        target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
+        target_compile_options(${PROJECT_NAME}_test PUBLIC ${FLAGS})
+    endif ()
 
 endif ()
 

@@ -16,6 +16,7 @@
   <depend>control_input_msgs</depend>
   <depend>qpoases_colcon</depend>
   <depend>ocs2_self_collision</depend>
+  <depend>ocs2_legged_robot</depend>
   <depend>ocs2_legged_robot_ros</depend>
   <depend>angles</depend>
 

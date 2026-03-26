@@ -23,7 +23,6 @@ endif ()
 
 find_package(ament_cmake REQUIRED)
 find_package(ocs2_pinocchio_interface REQUIRED)
-find_package(ocs2_robotic_assets REQUIRED)
 
 ###########
 ## Build ##
@@ -71,11 +70,14 @@ ament_lint_auto_find_test_dependencies()
 
 if (BUILD_TESTING)
     find_package(ament_cmake_gtest REQUIRED)
+    find_package(ocs2_robotic_assets QUIET)
 
-    ament_add_gtest(PinocchioSphereKinematicsTest test/testPinocchioSphereKinematics.cpp)
-    ament_target_dependencies(PinocchioSphereKinematicsTest ${dependencies} ocs2_robotic_assets)
-    target_link_libraries(PinocchioSphereKinematicsTest ${PROJECT_NAME} ${COAL_LIBRARIES})
-    target_compile_options(PinocchioSphereKinematicsTest PUBLIC ${FLAGS})
+    if (ocs2_robotic_assets_FOUND)
+        ament_add_gtest(PinocchioSphereKinematicsTest test/testPinocchioSphereKinematics.cpp)
+        ament_target_dependencies(PinocchioSphereKinematicsTest ${dependencies} ocs2_robotic_assets)
+        target_link_libraries(PinocchioSphereKinematicsTest ${PROJECT_NAME} ${COAL_LIBRARIES})
+        target_compile_options(PinocchioSphereKinematicsTest PUBLIC ${FLAGS})
+    endif ()
 
 endif ()
 
