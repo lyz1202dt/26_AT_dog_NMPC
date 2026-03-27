@@ -22,19 +22,19 @@
   </asset>
 
   <contact>
-        <exclude body1="body_link" body2="lf_link1" />
-        <exclude body1="body_link" body2="lf_link2" />
+        <exclude body1="base" body2="lf_link1" />
+        <exclude body1="base" body2="lf_link2" />
         <exclude body1="lf_link1" body2="lf_link2" />
         <exclude body1="lf_link2" body2="lf_link3" />
-        <exclude body1="body_link" body2="rf_link1" />
-        <exclude body1="body_link" body2="rf_link2" />
+        <exclude body1="base" body2="rf_link1" />
+        <exclude body1="base" body2="rf_link2" />
         <exclude body1="rf_link1" body2="rf_link2" />
         <exclude body1="rf_link2" body2="rf_link3" />
     </contact>
 
   <worldbody>
     <!-- Main body link with mass and inertia -->
-    <body name="body_link" pos="0 0 0.5">
+    <body name="base" pos="0 0 0.5">
       <freejoint/>
       <inertial pos="6.3455e-05 0.0025357 0.056203" quat="0.999996 -0.000182 0.00272 -5.07e-05" mass="4.2135" diaginertia="0.011761 0.010952 0.0060638"/>
       <geom type="mesh" rgba="1 1 1 1" mesh="body_link"/>

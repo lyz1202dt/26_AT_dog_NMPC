@@ -3,7 +3,7 @@ import os
 import xacro
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, OpaqueFunction, RegisterEventHandler
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, RegisterEventHandler
 from launch.event_handlers import OnProcessStart, OnProcessExit
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -50,30 +50,55 @@ def launch_setup(context, *args, **kwargs):
         arguments=["-d", rviz_config_file]
     )
 
-    load_joint_state_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'joint_state_broadcaster'],
-        output='screen'
+    load_joint_state_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "joint_state_broadcaster",
+            "--controller-manager", "/controller_manager",
+            "--controller-manager-timeout", "120",
+            "--service-call-timeout", "120"
+        ],
+        output="screen"
     )
 
-    load_imu_sensor_broadcaster = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'imu_sensor_broadcaster'],
-        output='screen'
+    load_imu_sensor_broadcaster = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "imu_sensor_broadcaster",
+            "--controller-manager", "/controller_manager",
+            "--controller-manager-timeout", "120",
+            "--service-call-timeout", "120"
+        ],
+        output="screen"
     )
 
     # 级联控制器架构：ocs2(上层) -> leg_pd(底层) -> mujoco
     # 先加载下层leg_pd_controller导出reference interfaces，再加载上层ocs2控制器
-    load_leg_pd_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'leg_pd_controller'],
-        output='screen'
+    load_leg_pd_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "leg_pd_controller",
+            "--controller-manager", "/controller_manager",
+            "--controller-manager-timeout", "120",
+            "--service-call-timeout", "120"
+        ],
+        output="screen"
     )
 
-    load_ocs2_quadruped_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'ocs2_quadruped_controller'],
-        output='screen'
+    load_ocs2_quadruped_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "ocs2_quadruped_controller",
+            "--controller-manager", "/controller_manager",
+            "--controller-manager-timeout", "120",
+            "--service-call-timeout", "120",
+            "--switch-timeout", "120"
+        ],
+        output="screen"
     )
 
     return [

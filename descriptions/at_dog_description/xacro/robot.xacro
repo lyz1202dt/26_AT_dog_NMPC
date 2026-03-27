@@ -15,7 +15,7 @@
   </xacro:unless>
 
   <joint name="imu_main_joint" type="fixed">
-    <parent link="body_link"/>
+    <parent link="base"/>
     <child link="imu_main_link"/>
     <origin rpy="0 0 0" xyz="0 0 0.056203"/>
   </joint>

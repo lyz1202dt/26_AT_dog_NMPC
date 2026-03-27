@@ -28,6 +28,7 @@ namespace ocs2::legged_robot
         num_decision_vars_ = info_.generalizedCoordinatesNum + 3 * info_.numThreeDofContacts + info_.actuatedDofNum;
         q_measured_ = vector_t(info_.generalizedCoordinatesNum);
         v_measured_ = vector_t(info_.generalizedCoordinatesNum);
+        ee_kinematics_->setPinocchioInterface(pinocchio_interface_measured_);
     }
 
     vector_t WbcBase::update(const vector_t& stateDesired, const vector_t& inputDesired,

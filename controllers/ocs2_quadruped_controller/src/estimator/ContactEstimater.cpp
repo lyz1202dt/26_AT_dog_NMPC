@@ -23,6 +23,7 @@ ContactEstimater::ContactEstimater(
     filtered_foot_forces_ = feet_array_t<scalar_t>{0.0, 0.0, 0.0, 0.0};
     contact_counter_      = feet_array_t<size_t>{0, 0, 0, 0};
     swing_counter_        = feet_array_t<size_t>{0, 0, 0, 0};
+    ee_kinematics_->setPinocchioInterface(*pinocchio_interface_);
 }
 
 scalar_t ContactEstimater::computeFootForceNorm(const size_t leg_index) {

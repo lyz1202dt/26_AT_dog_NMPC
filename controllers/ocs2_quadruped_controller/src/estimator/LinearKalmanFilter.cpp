@@ -52,6 +52,8 @@ namespace ocs2::legged_robot {
 
         this->has_foot_sensor=has_foot_sensor;
 
+        ee_kinematics_->setPinocchioInterface(pinocchio_interface_);
+
         initPublishers();
     }
 
